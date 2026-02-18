@@ -101,15 +101,16 @@ def display_explanation(input_df, session, aws_bucket):
     shap_values = explainer(input_df.iloc[[-1]])
 
     st.subheader("🔍 Decision Transparency (SHAP)")
-   plt.figure(figsize=(10, 4))
-shap.plots.waterfall(shap_values[0], max_display=10, show=False)
-st.pyplot(plt.gcf(), clear_figure=True)
+    fig, ax = plt.subplots(figsize=(10, 4))
+    shap.plots.waterfall(shap_values[0], max_display=10, show=False)
+    st.pyplot(fig, clear_figure=True)
 
-
+    # Most influential feature = largest absolute SHAP value
     vals = shap_values[0].values
-idx = int(np.argmax(np.abs(vals)))
-top_feature = shap_values[0].feature_names[idx]
-st.info(f"**Business Insight:** The most influential factor in this decision was **{top_feature}**.")
+    idx = int(np.argmax(np.abs(vals)))
+    top_feature = shap_values[0].feature_names[idx]
+    st.info(f"**Business Insight:** The most influential factor in this decision was **{top_feature}**.")
+
 
 
 # Streamlit UI
@@ -151,6 +152,7 @@ if submitted:
         display_explanation(input_df, session, aws_bucket)
     else:
         st.error(res)
+
 
 
 
