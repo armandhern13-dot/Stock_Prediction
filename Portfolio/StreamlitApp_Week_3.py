@@ -100,15 +100,29 @@ def display_explanation(input_df, session, aws_bucket):
     # Explain the LAST row only (your new input)
     shap_values = explainer(input_df.iloc[[-1]])
 
+   def display_explanation(input_df, session, aws_bucket):
+    explainer_name = MODEL_INFO["explainer"]
+    explainer = load_shap_explainer(
+        session,
+        aws_bucket,
+        posixpath.join("explainer", explainer_name),
+        os.path.join(tempfile.gettempdir(), explainer_name),
+    )
+
+    # Explain the LAST row only (your new input)
+    shap_values = explainer(input_df.iloc[[-1]])
+
     st.subheader("🔍 Decision Transparency (SHAP)")
+
     fig, ax = plt.subplots(figsize=(10, 4))
     shap.plots.waterfall(shap_values[0], max_display=10, show=False)
     st.pyplot(fig, clear_figure=True)
 
-    # Most influential feature = largest absolute SHAP value
+    # Pick the most influential feature by absolute SHAP value
     vals = shap_values[0].values
     idx = int(np.argmax(np.abs(vals)))
     top_feature = shap_values[0].feature_names[idx]
+
     st.info(f"**Business Insight:** The most influential factor in this decision was **{top_feature}**.")
 
 
@@ -152,6 +166,7 @@ if submitted:
         display_explanation(input_df, session, aws_bucket)
     else:
         st.error(res)
+
 
 
 
