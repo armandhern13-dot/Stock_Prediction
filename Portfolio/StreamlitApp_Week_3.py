@@ -5,16 +5,15 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import posixpath
 
-import joblib
-import tarfile
-import tempfile
-
 import boto3
 import sagemaker
 from sagemaker.predictor import Predictor
+from sagemaker.serializers import CSVSerializer
+from sagemaker.deserializers import JSONDeserializer
 from sagemaker.serializers import NumpySerializer
 from sagemaker.deserializers import NumpyDeserializer
 
+from sklearn.pipeline import Pipeline
 import shap
 
 # Setup & Path Configuration
@@ -73,12 +72,12 @@ def load_shap_explainer(_session, bucket, key, local_path):
         return shap.Explainer.load(f)
 
 def call_model_api(input_df: pd.DataFrame):
-    predictor = Predictor(
-        endpoint_name=MODEL_INFO["endpoint"],
-        sagemaker_session=sm_session,
-        serializer=NumpySerializer(),
-        deserializer=NumpyDeserializer()
-    )
+predictor = Predictor(
+    endpoint_name=MODEL_INFO["endpoint"],
+    sagemaker_session=sm_session,
+    serializer=NumpySerializer(),
+    deserializer=JSONDeserializer()
+)
 
     try:
         payload = input_df.to_numpy(dtype=np.float32)
@@ -166,6 +165,7 @@ if submitted:
         display_explanation(input_df, session, aws_bucket)
     else:
         st.error(res)
+
 
 
 
