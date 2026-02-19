@@ -29,11 +29,11 @@ if project_root not in sys.path:
 from src.feature_utils import extract_features
 
 # Access the secrets
-aws_id = st.secrets["aws_credentials"]["AWS_ACCESS_KEY_ID"]
-aws_secret = st.secrets["aws_credentials"]["AWS_SECRET_ACCESS_KEY"]
-aws_token = st.secrets["aws_credentials"]["AWS_SESSION_TOKEN"]
-aws_bucket = st.secrets["aws_credentials"]["AWS_BUCKET"]
-aws_endpoint = st.secrets["aws_credentials"]["AWS_ENDPOINT"]
+aws_id = st.secrets["aws_credentials"]["AWS_ACCESS_KEY_ID"].strip()
+aws_secret = st.secrets["aws_credentials"]["AWS_SECRET_ACCESS_KEY"].strip()
+aws_token = st.secrets["aws_credentials"]["AWS_SESSION_TOKEN"].strip()
+aws_bucket = st.secrets["aws_credentials"]["AWS_BUCKET"].strip()
+aws_endpoint = st.secrets["aws_credentials"]["AWS_ENDPOINT"].strip()
 
 # AWS Session Management
 @st.cache_resource
@@ -166,6 +166,7 @@ if submitted:
         display_explanation(input_df, session, aws_bucket)
     else:
         st.error(res)
+
 
 
 
