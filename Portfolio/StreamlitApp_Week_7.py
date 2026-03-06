@@ -9,13 +9,23 @@ st.title("Bitcoin Signal Prediction (SageMaker Endpoint)")
 FEATURE_COLS = ["EMA_10", "ROC_10", "MOM_10", "RSI_10", "MA_10"]
 LABEL_MAP = {0: "SELL", 1: "HOLD", 2: "BUY"}
 
-region = st.secrets["AWS_REGION"]
-endpoint = st.secrets["SAGEMAKER_ENDPOINT_NAME"]
+# --- Secrets loader (works with or without [aws_credentials]) ---
+secrets = st.secrets["aws_credentials"] if "aws_credentials" in st.secrets else st.secrets
+
+region = secrets.get("AWS_REGION", "us-east-1")  # default if missing
+endpoint = secrets.get("SAGEMAKER_ENDPOINT_NAME")
+
+required = ["SAGEMAKER_ENDPOINT_NAME", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+missing = [k for k in required if not secrets.get(k)]
+if missing:
+    st.error(f"Missing secrets: {missing}")
+    st.write("Available secret keys:", list(secrets.keys()))
+    st.stop()
 
 session = boto3.Session(
-    aws_access_key_id=st.secrets["AWS_ACCESS_KEY_ID"],
-    aws_secret_access_key=st.secrets["AWS_SECRET_ACCESS_KEY"],
-    aws_session_token=st.secrets.get("AWS_SESSION_TOKEN"),
+    aws_access_key_id=secrets["AWS_ACCESS_KEY_ID"],
+    aws_secret_access_key=secrets["AWS_SECRET_ACCESS_KEY"],
+    aws_session_token=secrets.get("AWS_SESSION_TOKEN"),
     region_name=region,
 )
 
@@ -53,6 +63,7 @@ if st.button("Predict Signal"):
 
     except Exception as e:
         st.error(f"Invoke failed: {e}")
+
 
 
 
