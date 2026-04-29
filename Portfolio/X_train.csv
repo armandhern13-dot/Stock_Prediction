@@ -1,5 +1,0 @@
-X2_train_df = pd.DataFrame(X2_train_scaled, columns=feature_set_2)
-X2_train_df.to_csv('X_train.csv', index=False)
-print("X_train saved as X_train.csv")
-print(f"Shape: {X2_train_df.shape}")
-print(f"Columns: {list(X2_train_df.columns)}")
